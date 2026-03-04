@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skincare EC Creative Portfolio — AI Creative Pipeline</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --card: #13131a;
+    --card-hover: #1a1a24;
+    --accent: #e8b4b8;
+    --accent2: #c9a0dc;
+    --gold: #d4af37;
+    --text: #e8e6e3;
+    --text-dim: #8a8a9a;
+    --border: #2a2a3a;
+    --glass: rgba(255,255,255,0.04);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Helvetica Neue','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif; overflow-x:hidden; }
+
+  /* Auth Gate */
+  .auth-gate {
+    position:fixed; inset:0; z-index:9999; background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .auth-gate.hidden { display:none; }
+  .auth-box {
+    background:var(--card); border:1px solid var(--border); border-radius:24px;
+    padding:48px 40px; max-width:400px; width:90%; text-align:center;
+  }
+  .auth-box h2 { font-size:20px; margin-bottom:8px; }
+  .auth-box p { font-size:13px; color:var(--text-dim); margin-bottom:24px; }
+  .auth-box input {
+    width:100%; padding:12px 16px; border-radius:12px; border:1px solid var(--border);
+    background:rgba(0,0,0,0.3); color:var(--text); font-size:14px;
+    margin-bottom:12px; outline:none; transition:border 0.2s;
+  }
+  .auth-box input:focus { border-color:var(--accent); }
+  .auth-box button {
+    width:100%; padding:12px; border-radius:12px; border:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#000; font-size:14px; font-weight:600; cursor:pointer;
+    transition:opacity 0.2s;
+  }
+  .auth-box button:hover { opacity:0.9; }
+  .auth-error { color:#ff6b6b; font-size:12px; margin-top:8px; display:none; }
+  .auth-lock { font-size:48px; margin-bottom:16px; }
+
+  /* Hero */
+  .hero {
+    min-height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; padding:80px 24px 60px;
+    background:linear-gradient(180deg, #0f0a18 0%, var(--bg) 100%);
+    position:relative;
+  }
+  .hero::before {
+    content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:600px; height:600px; border-radius:50%;
+    background:radial-gradient(circle, rgba(200,160,220,0.08) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .hero-badge {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 16px; border-radius:100px; font-size:12px; letter-spacing:1px;
+    background:var(--glass); border:1px solid var(--border); color:var(--accent);
+    text-transform:uppercase; margin-bottom:24px;
+  }
+  .hero-badge .dot { width:6px; height:6px; border-radius:50%; background:var(--gold); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .hero h1 { font-size:clamp(32px,5vw,56px); font-weight:700; letter-spacing:-1px; line-height:1.2; margin-bottom:16px; }
+  .hero h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { font-size:16px; color:var(--text-dim); max-width:600px; line-height:1.7; }
+
+  /* Pipeline Stats */
+  .stats {
+    display:flex; gap:1px; background:var(--border); border-radius:16px; overflow:hidden;
+    max-width:800px; margin:40px auto 0;
+  }
+  .stat { flex:1; padding:20px 16px; background:var(--card); text-align:center; }
+  .stat-value { font-size:24px; font-weight:700; color:var(--accent); }
+  .stat-label { font-size:11px; color:var(--text-dim); margin-top:4px; letter-spacing:0.5px; }
+
+  /* Pipeline Flow */
+  .pipeline-section { padding:40px 24px; max-width:900px; margin:0 auto; }
+  .pipeline-flow {
+    display:flex; align-items:center; gap:0; justify-content:center; flex-wrap:wrap;
+    padding:24px; background:var(--card); border-radius:16px; border:1px solid var(--border);
+  }
+  .pipeline-step { display:flex; align-items:center; gap:8px; padding:10px 16px; font-size:13px; color:var(--text-dim); }
+  .pipeline-step .icon { font-size:18px; }
+  .pipeline-step .name { font-weight:600; color:var(--text); }
+  .pipeline-arrow { color:var(--accent2); font-size:18px; margin:0 4px; }
+
+  /* Grid */
+  .grid-section { padding:40px 24px 80px; max-width:1400px; margin:0 auto; }
+  .section-title { font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:32px; text-align:center; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:24px; }
+
+  /* Card */
+  .card {
+    background:var(--card); border-radius:20px; overflow:hidden;
+    border:1px solid var(--border); transition:all 0.3s ease; cursor:pointer;
+  }
+  .card:hover { background:var(--card-hover); transform:translateY(-4px); box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+  .card-media { position:relative; aspect-ratio:9/14; overflow:hidden; background:#000; }
+  .card-media img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease; }
+  .card:hover .card-media img { transform:scale(1.03); }
+  .card-media .play-btn {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:64px; height:64px; border-radius:50%;
+    background:rgba(255,255,255,0.15); backdrop-filter:blur(10px);
+    display:flex; align-items:center; justify-content:center;
+    border:2px solid rgba(255,255,255,0.3); transition:all 0.3s; opacity:0;
+  }
+  .card:hover .play-btn { opacity:1; }
+  .play-btn svg { width:24px; height:24px; fill:#fff; margin-left:3px; }
+  .card-num {
+    position:absolute; top:12px; left:12px;
+    background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
+    padding:4px 12px; border-radius:100px; font-size:12px; font-weight:700;
+    color:var(--gold); border:1px solid rgba(212,175,55,0.3);
+  }
+  .card-body { padding:20px; }
+  .card-title { font-size:16px; font-weight:700; margin-bottom:8px; line-height:1.4; }
+  .card-emotion {
+    display:inline-flex; align-items:center; gap:6px;
+    padding:4px 12px; border-radius:100px; font-size:11px;
+    background:linear-gradient(135deg,rgba(232,180,184,0.12),rgba(201,160,220,0.12));
+    color:var(--accent); border:1px solid rgba(232,180,184,0.15); margin-bottom:12px;
+  }
+  .card-hypothesis { font-size:13px; color:var(--text-dim); line-height:1.6; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .card-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+  .tag { font-size:10px; padding:3px 10px; border-radius:100px; background:var(--glass); border:1px solid var(--border); color:var(--text-dim); }
+
+  /* Modal */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:1000; display:none; align-items:center; justify-content:center; padding:20px; overflow-y:auto; }
+  .modal-overlay.active { display:flex; }
+  .modal { background:var(--card); border-radius:24px; border:1px solid var(--border); max-width:1000px; width:100%; max-height:90vh; overflow-y:auto; position:relative; }
+  .modal-close { position:sticky; top:16px; float:right; margin:16px; width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:10; transition:all 0.2s; }
+  .modal-close:hover { background:var(--border); }
+  .modal-content { display:flex; gap:0; flex-wrap:wrap; }
+  .modal-left { flex:0 0 360px; max-width:360px; min-height:500px; background:#000; display:flex; align-items:center; justify-content:center; position:relative; }
+  .modal-left video, .modal-left img { width:100%; height:100%; object-fit:contain; }
+  .media-toggle { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:4px; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); border-radius:100px; padding:4px; border:1px solid var(--border); }
+  .media-toggle button { padding:6px 16px; border-radius:100px; border:none; font-size:11px; cursor:pointer; transition:all 0.2s; background:transparent; color:var(--text-dim); }
+  .media-toggle button.active { background:var(--accent); color:#000; font-weight:600; }
+  .modal-right { flex:1; min-width:300px; padding:32px; overflow-y:auto; }
+  .modal-right h2 { font-size:22px; font-weight:700; margin-bottom:4px; }
+  .modal-right .source { font-size:12px; color:var(--text-dim); margin-bottom:20px; }
+  .detail-section { margin-bottom:24px; }
+  .detail-label { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent2); margin-bottom:8px; font-weight:600; }
+  .detail-text { font-size:14px; line-height:1.7; color:var(--text); }
+  .emotion-flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .emotion-chip { padding:6px 14px; border-radius:100px; font-size:12px; font-weight:600; background:linear-gradient(135deg,rgba(232,180,184,0.15),rgba(201,160,220,0.15)); border:1px solid rgba(232,180,184,0.2); color:var(--accent); }
+  .emotion-arrow { color:var(--text-dim); font-size:16px; }
+  .technique-badge { display:inline-block; padding:6px 14px; border-radius:8px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.2); color:var(--gold); font-size:12px; font-weight:600; }
+  .prompt-box { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:12px; padding:16px; font-size:12px; line-height:1.6; color:var(--text-dim); font-family:'SF Mono','Fira Code',monospace; max-height:200px; overflow-y:auto; white-space:pre-wrap; word-break:break-all; }
+
+  /* Footer */
+  .footer { text-align:center; padding:40px 24px; font-size:11px; color:var(--text-dim); border-top:1px solid var(--border); }
+  .footer a { color:var(--accent); text-decoration:none; }
+
+  @media(max-width:768px) {
+    .modal-content { flex-direction:column; }
+    .modal-left { flex:none; max-width:100%; min-height:400px; }
+    .grid { grid-template-columns:1fr 1fr; }
+    .stats { flex-direction:column; }
+  }
+  @media(max-width:480px) { .grid { grid-template-columns:1fr; } }
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <div class="auth-lock">🔐</div>
+    <h2>Portfolio Access</h2>
+    <p>閲覧にはパスワードが必要です</p>
+    <input type="password" id="authPass" placeholder="パスワードを入力" onkeydown="if(event.key==='Enter')tryAuth()">
+    <button onclick="tryAuth()">Enter</button>
+    <div class="auth-error" id="authError">パスワードが違います</div>
+  </div>
+</div>
+
+<!-- Main Content (hidden until auth) -->
+<div id="mainContent" style="display:none">
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span>AI Creative Pipeline</div>
+  <h1>Skincare EC<br><span>Creative Portfolio</span></h1>
+  <p>DPro競合分析 → Gemini 3.1 Proシーン分析 → nanobanan2画像生成 → Veo 3.1動画生成。<br>全自動AIパイプラインで生成した10素材のポートフォリオ。</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-value">191</div><div class="stat-label">分析シーン数</div></div>
+    <div class="stat"><div class="stat-value">10</div><div class="stat-label">生成クリエイティブ</div></div>
+    <div class="stat"><div class="stat-value">9:16</div><div class="stat-label">縦型フォーマット</div></div>
+    <div class="stat"><div class="stat-value">20-30代</div><div class="stat-label">ターゲット</div></div>
+  </div>
+</section>
+
+<!-- Pipeline Flow -->
+<section class="pipeline-section">
+  <div class="pipeline-flow">
+    <div class="pipeline-step"><span class="icon">📊</span><span class="name">DPro MCP</span><span>競合TOP10取得</span></div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step"><span class="icon">🧠</span><span class="name">Gemini 3.1 Pro</span><span>2秒シーン分析</span></div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step"><span class="icon">🎯</span><span class="name">感情仮説設計</span><span>TOP10選定</span></div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step"><span class="icon">🖼️</span><span class="name">nanobanan2</span><span>縦型画像生成</span></div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step"><span class="icon">🎬</span><span class="name">Veo 3.1</span><span>縦型動画生成</span></div>
+  </div>
+</section>
+
+<!-- Grid -->
+<section class="grid-section">
+  <div class="section-title">Generated Creatives</div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&#10005;</button>
+    <div class="modal-content">
+      <div class="modal-left" id="modal-media"></div>
+      <div class="modal-right" id="modal-detail"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  Built with AI Creative Pipeline — DPro MCP + Gemini 3.1 Pro + nanobanan2 + Veo 3.1<br>
+  <span style="color:var(--gold)">2026.03</span>
+</footer>
+
+</div><!-- /mainContent -->
+
+<script>
+// --- Auth ---
+const AUTH_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'; // sha256("password")
+async function sha256(msg) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function tryAuth() {
+  const pass = document.getElementById('authPass').value;
+  const hash = await sha256(pass);
+  if (hash === AUTH_HASH) {
+    document.getElementById('authGate').classList.add('hidden');
+    document.getElementById('mainContent').style.display = 'block';
+    sessionStorage.setItem('portfolio_auth', '1');
+  } else {
+    document.getElementById('authError').style.display = 'block';
+    document.getElementById('authPass').value = '';
+    document.getElementById('authPass').focus();
+  }
+}
+// Auto-login if already authenticated in session
+if (sessionStorage.getItem('portfolio_auth') === '1') {
+  document.getElementById('authGate').classList.add('hidden');
+  document.getElementById('mainContent').style.display = 'block';
+}
+
+// --- Scenes Data ---
+const SCENES = [
+  {id:1, title:"Before/After 年齢逆行の衝撃", source:"Rank1 オレリー リンクルリペア", emotion_hypothesis:"「え、昔より今の方が綺麗なの!?」という驚愕 → 商品への圧倒的信頼感", target_emotion:"驚愕 → 憧れ → 期待", emotions:["驚愕","憧れ","期待"], technique:"究極のBefore/After、ビジュアルエビデンス", image_prompt:"Photorealistic vertical 9:16 portrait format. Split-screen comparison of a beautiful Japanese woman in her 40s. LEFT side labeled '20代' shows slightly dull, tired-looking skin. RIGHT side labeled '40代' shows radiant, glowing, porcelain-smooth skin with a confident smile.", motion_prompt:"Smooth horizontal wipe transition revealing the After side. Subtle sparkle particles appearing on the glowing skin side. Camera slowly pushes in on the radiant face. Elegant, aspirational mood.", tags:["Before/After","ビジュアル証明","年齢逆行"]},
+  {id:2, title:"美容部員の秘密暴露フック", source:"Rank3 エシエンス ナノシープセラム", emotion_hypothesis:"「美容のプロが言いにくいことを暴露してる…」という好奇心で離脱を止める", target_emotion:"好奇心 → 信頼 → 期待", emotions:["好奇心","信頼","期待"], technique:"権威性 × 本音の暴露フック", image_prompt:"Close-up of a beautiful Japanese woman in her late 40s wearing a white beauty clinic uniform, leaning slightly toward camera with a secretive expression. Bold red banner: 「美容部員が本当は言いたくない」.", motion_prompt:"Woman leans slightly closer to camera as if sharing a secret. Her eyes widen slightly. Subtle zoom in on her face. Mysterious, intriguing atmosphere.", tags:["権威性","暴露フック","好奇心"]},
+  {id:3, title:"衝撃プライスドロップ", source:"Rank1 オレリー × Rank7 VinnaC", emotion_hypothesis:"「こんなに安いの!?」→ 買わない理由がなくなる瞬間の興奮", target_emotion:"驚き → 喜び → 即決意欲", emotions:["驚き","喜び","即決意欲"], technique:"アンカリング回収、価格インパクト", image_prompt:"Young Japanese woman in her late 20s, eyes wide open in genuine surprise, both hands on cheeks. Crossed-out ¥12,540, giant red ¥1,980 with 84%OFF badge. Luxury skincare set at bottom.", motion_prompt:"Quick zoom out revealing the discount price with a pop animation effect. Confetti or sparkle particles burst around the price. Energetic, exciting mood.", tags:["アンカリング","価格訴求","84%OFF"]},
+  {id:4, title:"シミ消し Before/After 接写", source:"Rank7 VinnaC ナノ生ビタミンC美容液", emotion_hypothesis:"「シミがこんなに消えるの!?」→ 自分の肌にも効くかもという強い期待", target_emotion:"驚き → 強い憧れ → 試したい欲求", emotions:["驚き","強い憧れ","試したい"], technique:"圧倒的After提示、視覚的証明", image_prompt:"Ultra close-up of a Japanese woman's cheek area, split vertically. LEFT: visible brown spots, uneven tone. RIGHT: dramatically clearer, glass-like dewy skin. Dividing line is a golden serum trail. Text: 「どこいった？」.", motion_prompt:"Slow reveal wipe from spotted skin to clear skin, like golden serum being applied. Camera slowly pushes in. Gentle, hopeful, transformative mood.", tags:["Before/After","接写","シミ消し"]},
+  {id:5, title:"リアルな肌悩み自分事化フック", source:"Rank7 VinnaC", emotion_hypothesis:"「これ私のことだ…」とドキッとさせて、スクロールを止める", target_emotion:"ドキッ → 共感 → 解決策への期待", emotions:["ドキッ","共感","期待"], technique:"ネガティブアプローチ、リアルな肌悩み接写、ペルソナ言語化", image_prompt:"Extreme close-up of a Japanese woman's face showing realistic skin concerns: light brown age spots, enlarged pores, fine lines. Natural bathroom lighting, no makeup. Text: 「20代のケア不足、30代で後悔」.", motion_prompt:"Very slow subtle zoom into the skin texture. Woman's finger gently touches one of the spots. Expression shifts from worry to determination. Soft, empathetic mood.", tags:["ネガティブ","自分事化","UGC感"]},
+  {id:6, title:"常識否定インパクトフック", source:"Rank4 ポーラ B.A ローション", emotion_hypothesis:"「え、今までの洗顔間違ってたの!?」→ 答えを知りたい強烈な好奇心", target_emotion:"ハッとする → 不安 → 知りたい欲求", emotions:["ハッ","不安","知りたい"], technique:"常識の否定フック、問いかけ", image_prompt:"Young Japanese woman in her mid-20s in a bright clean bathroom, shocked expression while holding face wash. Foam on one cheek. Bold text: 「その洗顔、老化の原因かも」.", motion_prompt:"Quick zoom in on her shocked face. Text slams in with impact. She freezes mid-wash. Dramatic pause effect. Attention-grabbing, slightly alarming mood.", tags:["常識否定","問いかけ","老化フック"]},
+  {id:7, title:"理想の透明感ツヤ肌", source:"Rank2 Nオーガニック Basic", emotion_hypothesis:"「こんな肌になりたい…」→ 理想の未来を見せて購買欲を最大化", target_emotion:"純粋な憧れ → 希望 → 行動意欲", emotions:["憧れ","希望","行動意欲"], technique:"理想のAfter提示、ツヤ肌の可視化", image_prompt:"Beautiful Japanese woman in her early 30s with flawless luminous glass-skin complexion. Eyes closed in bliss, gentle satisfied smile. Soft golden hour lighting. Text: 「つるん、もっちり」.", motion_prompt:"Ultra slow motion of light catching dewy skin surface. She slowly opens her eyes and smiles. Gentle floating light particles. Dreamy, luxurious, aspirational mood.", tags:["理想After","ツヤ肌","ガラス肌"]},
+  {id:8, title:"濃密泡テクスチャー体験", source:"Rank4 ポーラ B.A ローション", emotion_hypothesis:"「この泡、触ってみたい！」→ テクスチャーへの強い欲求で試用意欲を喚起", target_emotion:"感心 → 触りたい欲求 → 試したい衝動", emotions:["感心","触りたい","試したい"], technique:"テクスチャーの可視化、シズル感", image_prompt:"Close-up of Japanese woman's hands cupping incredibly rich, dense, whipped cream-like facial foam with perfect peak. Text: 「弾力泡で毛穴ごっそり」.", motion_prompt:"Dense foam slowly bounces as she gently squeezes it. Finger presses into foam and it springs back. Extreme close-up texture. Satisfying, ASMR-like tactile mood.", tags:["シズル感","ASMR","テクスチャー"]},
+  {id:9, title:"美容医療不要宣言", source:"Rank3/Rank6 エシエンス", emotion_hypothesis:"「美容医療は高すぎるけど、これなら手が届く！」→ コスパ最強の代替案への安堵と期待", target_emotion:"共感 → 安堵 → お得感 → 決意", emotions:["共感","安堵","お得感","決意"], technique:"ペインポイント代弁、アンカリング（高額美容医療との比較）", image_prompt:"Japanese beauty clinic professional woman in white uniform, 'stop' gesture. Crossed-out '美容クリニック ¥50,000〜'. Below: 'この美容液 ¥1,980'. Text: 「ヒアルロン酸よりコスパ◎」.", motion_prompt:"She shakes her head at clinic price, nods approvingly at serum price. Price comparison animation slides in. Trustworthy, informative, empowering mood.", tags:["コスパ比較","美容医療","権威性"]},
+  {id:10, title:"年齢ギャップ街頭インタビュー", source:"Rank8 VinnaC (CR-B)", emotion_hypothesis:"「50歳でこの肌!? 何使ってるの!?」→ 秘密を知りたい強烈な好奇心", target_emotion:"驚愕 → 好奇心 → 自分も欲しい", emotions:["驚愕","好奇心","欲しい"], technique:"年齢と見た目のギャップフック、UGC感", image_prompt:"Street interview style: Stylish Japanese woman with blonde bob on busy Tokyo street, incredibly youthful glowing skin. Microphone held toward her. Age label '50歳' in large yellow text. Text: 「レーザーじゃないのにこの肌」.", motion_prompt:"Handheld camera slight shake for authentic feel. She laughs and touches her face. Zoom in slowly on flawless skin. Text '50歳' pops in. Energetic, surprising documentary mood.", tags:["年齢ギャップ","UGC","街頭インタビュー"]}
+];
+
+// Build grid
+const grid = document.getElementById('grid');
+SCENES.forEach(s => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.onclick = () => openModal(s.id);
+  const num = String(s.id).padStart(2,'0');
+  card.innerHTML = `
+    <div class="card-media">
+      <img src="images/skincare_${num}.png" alt="${s.title}" loading="lazy">
+      <div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <span class="card-num">#${s.id}</span>
+    </div>
+    <div class="card-body">
+      <div class="card-title">${s.title}</div>
+      <div class="card-emotion">💫 ${s.target_emotion}</div>
+      <div class="card-hypothesis">${s.emotion_hypothesis}</div>
+      <div class="card-tags">${s.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>`;
+  grid.appendChild(card);
+});
+
+function openModal(id) {
+  const s = SCENES.find(x=>x.id===id);
+  if(!s) return;
+  const num = String(s.id).padStart(2,'0');
+  document.getElementById('modal-media').innerHTML = `
+    <video id="modal-video" src="videos/video_${num}.mp4" poster="images/skincare_${num}.png" controls playsinline style="display:block"></video>
+    <img id="modal-img" src="images/skincare_${num}.png" alt="${s.title}" style="display:none">
+    <div class="media-toggle">
+      <button class="active" onclick="toggleMedia('video')">🎬 動画</button>
+      <button onclick="toggleMedia('image')">🖼️ 静止画</button>
+    </div>`;
+  document.getElementById('modal-detail').innerHTML = `
+    <h2>${s.title}</h2>
+    <div class="source">参考元: ${s.source}</div>
+    <div class="detail-section"><div class="detail-label">感情仮説 — Emotion Hypothesis</div><div class="detail-text">${s.emotion_hypothesis}</div></div>
+    <div class="detail-section"><div class="detail-label">感情ジャーニー — Emotion Flow</div><div class="emotion-flow">${s.emotions.map((e,i)=>`<span class="emotion-chip">${e}</span>${i<s.emotions.length-1?'<span class="emotion-arrow">→</span>':''}`).join('')}</div></div>
+    <div class="detail-section"><div class="detail-label">広告テクニック — Technique</div><div class="technique-badge">${s.technique}</div></div>
+    <div class="detail-section"><div class="detail-label">参考にしたシーン — Source Analysis</div><div class="detail-text">DPro MCPで取得した「${s.source}」の広告動画をGemini 3.1 Proで2秒シーン分析。191シーン中のインパクトスコアTOP10から選定。</div></div>
+    <div class="detail-section"><div class="detail-label">画像プロンプト — nanobanan2</div><div class="prompt-box">${s.image_prompt}</div></div>
+    <div class="detail-section"><div class="detail-label">動画プロンプト — Veo 3.1</div><div class="prompt-box">${s.motion_prompt}</div></div>`;
+  document.getElementById('modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const v = document.getElementById('modal-video');
+  if(v) v.pause();
+  document.getElementById('modal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function toggleMedia(type) {
+  const vid = document.getElementById('modal-video');
+  const img = document.getElementById('modal-img');
+  const btns = document.querySelectorAll('.media-toggle button');
+  if(type==='video') { vid.style.display='block'; img.style.display='none'; btns[0].classList.add('active'); btns[1].classList.remove('active'); }
+  else { vid.style.display='none'; vid.pause(); img.style.display='block'; btns[1].classList.add('active'); btns[0].classList.remove('active'); }
+}
+
+document.getElementById('modal').addEventListener('click', e => { if(e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>
