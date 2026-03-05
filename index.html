@@ -195,7 +195,7 @@
 <section class="hero">
   <div class="hero-badge"><span class="dot"></span>AI Creative Pipeline</div>
   <h1>Skincare EC<br><span>Creative Portfolio</span></h1>
-  <p>DPro競合分析 → Gemini 3.1 Proシーン分析 → nanobanan2画像生成 → Veo 3.1動画生成。<br>全自動AIパイプラインで生成した10素材のポートフォリオ。</p>
+  <p>DPro競合分析 → Gemini 3.1 Proシーン分析 → nanobanan2画像生成 → Grok動画生成。<br>全自動AIパイプラインで生成した10素材のポートフォリオ。</p>
   <div class="stats">
     <div class="stat"><div class="stat-value">191</div><div class="stat-label">分析シーン数</div></div>
     <div class="stat"><div class="stat-value">10</div><div class="stat-label">生成クリエイティブ</div></div>
@@ -215,7 +215,7 @@
     <span class="pipeline-arrow">→</span>
     <div class="pipeline-step"><span class="icon">🖼️</span><span class="name">nanobanan2</span><span>縦型画像生成</span></div>
     <span class="pipeline-arrow">→</span>
-    <div class="pipeline-step"><span class="icon">🎬</span><span class="name">Veo 3.1</span><span>縦型動画生成</span></div>
+    <div class="pipeline-step"><span class="icon">🎬</span><span class="name">Grok Video</span><span>動画生成</span></div>
   </div>
 </section>
 
@@ -238,7 +238,7 @@
 
 <!-- Footer -->
 <footer class="footer">
-  Built with AI Creative Pipeline — DPro MCP + Gemini 3.1 Pro + nanobanan2 + Veo 3.1<br>
+  Built with AI Creative Pipeline — DPro MCP + Gemini 3.1 Pro + nanobanan2 + Grok Video<br>
   <span style="color:var(--gold)">2026.03</span>
 </footer>
 
@@ -325,7 +325,7 @@ function openModal(id) {
     <div class="detail-section"><div class="detail-label">広告テクニック — Technique</div><div class="technique-badge">${s.technique}</div></div>
     <div class="detail-section"><div class="detail-label">参考にしたシーン — Source Analysis</div><div class="detail-text">DPro MCPで取得した「${s.source}」の広告動画をGemini 3.1 Proで2秒シーン分析。191シーン中のインパクトスコアTOP10から選定。</div></div>
     <div class="detail-section"><div class="detail-label">画像プロンプト — nanobanan2</div><div class="prompt-box">${s.image_prompt}</div></div>
-    <div class="detail-section"><div class="detail-label">動画プロンプト — Veo 3.1</div><div class="prompt-box">${s.motion_prompt}</div></div>`;
+    <div class="detail-section"><div class="detail-label">動画プロンプト — Grok Video</div><div class="prompt-box">${s.motion_prompt}</div></div>`;
   document.getElementById('modal').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
